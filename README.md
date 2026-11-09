@@ -42,10 +42,10 @@ python -m pip install -r requirements.txt
 ```powershell
 python -m har_compare.prepare --data-dir data
 powershell -ExecutionPolicy Bypass -File scripts/run_smoke.ps1 -Python python -Device cuda
-python -m har_compare.summarize --runs-root runs/smoke --output-dir reports/smoke
+python -m har_compare.summarize --runs-root runs/smoke --output-dir reports/reproduced_smoke
 ```
 
-数据自动从 UCI 官方来源下载。处理后的数据保存在 `data/processed/`，训练记录和权重保存在 `runs/smoke/`，轻量结果与图表导出到 `reports/smoke/`。试跑仅评价验证集。
+数据自动从 UCI 官方来源下载。处理后的数据保存在 `data/processed/`，训练记录和权重保存在 `runs/smoke/`，轻量结果与图表导出到 `reports/reproduced_smoke/`。试跑仅评价验证集。
 
 ## 复现完整实验
 
@@ -54,11 +54,12 @@ python -m har_compare.summarize --runs-root runs/smoke --output-dir reports/smok
 每个模型在验证集上尝试学习率 `0.0003`、`0.001`、`0.003`，共用调参种子 41、最多 50 轮和 8 轮早停耐心值。随后用选定配置训练三个种子，冻结全部检查点，再统一评价官方测试集。
 
 ```powershell
+python -m har_compare.prepare --data-dir data
 python -m har_compare.formal_train tune --root runs/formal_v1 --device cuda
 python -m har_compare.formal_train train --root runs/formal_v1 --device cuda
 python -m har_compare.formal_test freeze --root runs/formal_v1
 python -m har_compare.formal_test evaluate --root runs/formal_v1 --device cuda
-python -m har_compare.formal_report --root runs/formal_v1 --output reports/formal
+python -m har_compare.formal_report --root runs/formal_v1 --output reports/reproduced_formal
 ```
 
 ### 噪声鲁棒性
@@ -68,10 +69,10 @@ python -m har_compare.formal_report --root runs/formal_v1 --output reports/forma
 ```powershell
 python -m har_compare.noise_eval plan --root runs/formal_v1
 python -m har_compare.noise_eval evaluate --root runs/formal_v1 --device cuda
-python -m har_compare.noise_report --input runs/formal_v1/noise_v1/results.json --output reports/noise
+python -m har_compare.noise_report --input runs/formal_v1/noise_v1/results.json --output reports/reproduced_noise
 ```
 
-所有模型共用同一份噪声输入。降幅按每个检查点的干净分数减去带噪分数计算，再汇总三个种子。已有实验目录时，为新实验统一换用新的 `--root`、`--output` 和对应的 `--input` 路径；试跑可通过 `-OutputRoot` 指定新目录。
+所有模型共用同一份噪声输入。降幅按每个检查点的干净分数减去带噪分数计算，再汇总三个种子。复现结果写入 `reports/reproduced_*`，仓库附带的原实验结果位于 `reports/smoke/`、`reports/formal/` 和 `reports/noise/`。重复复现且已有实验目录时，为新实验统一换用新的 `--root`、`--output` 和对应的 `--input` 路径；试跑可通过 `-OutputRoot` 指定新目录。
 
 ### 检查
 
