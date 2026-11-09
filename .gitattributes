@@ -7,3 +7,4 @@
 *.png binary
 # Preserve original bytes for the published experiment hashes.
 reports/formal/**/*.json -text
+reports/noise/*.json -text

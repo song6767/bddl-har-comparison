@@ -6,6 +6,8 @@
 
 三个模型各在验证集上尝试 3 个学习率，再用选定的学习率分别训练 3 个随机种子。冻结 9 个检查点后，在同一官方测试集上统一评分。[正式对比结果与图表](reports/formal/README.md)
 
+在同一官方测试集上，使用这 9 个检查点比较 20 dB 和 10 dB 人工噪声造成的分数下降。[噪声鲁棒性结果与图表](reports/noise/README.md)
+
 各模型训练 5 轮、使用单个种子的流程试跑另有记录。[试跑结果与图表](reports/smoke/README.md)
 
 ## 数据与实验范围
@@ -137,6 +139,18 @@ python -m har_compare.evaluate --checkpoint runs/smoke/cnn/best.pt --data-dir da
 ```
 
 单检查点复核默认使用验证集。复现正式测试时，使用上面的冻结和批量评估入口。
+
+## 复现噪声鲁棒性实验
+
+完成正式冻结和干净测试后，在同一个本地实验目录中运行以下命令。评估使用与正式测试相同的设备类型。若已生成前两步的记录，可直接运行汇总命令。
+
+```powershell
+python -m har_compare.noise_eval plan --root runs/formal_v1
+python -m har_compare.noise_eval evaluate --root runs/formal_v1 --device cuda
+python -m har_compare.noise_report --input runs/formal_v1/noise_v1/results.json --output reports/noise
+```
+
+第一步在评分前写入噪声协议和原冻结清单的校验值。第二步核对 9 个检查点，复核干净测试的分数和混淆矩阵，然后对两档带噪输入评分。同一档的所有检查点使用同一份输入。每次先按检查点计算干净分数减带噪分数，再按模型汇总三个训练种子的均值和样本标准差。下降量的单位为百分点。加噪方法见[实验协议](docs/EXPERIMENT_PROTOCOL.md#人工噪声敏感性)。
 
 ## 检查项目
 

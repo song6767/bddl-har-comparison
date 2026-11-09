@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "snr_db": [
+    20,
+    10
+  ],
+  "noise_seed": 20261109,
+  "generator": "NumPy Generator(PCG64)",
+  "input_domain": "Standardized official UCI HAR inertial windows",
+  "noise": "Independent standard-normal draws before RMS scaling per window and channel",
+  "power": "Mean square over the 128 time points, including DC",
+  "scaling": "Unit-RMS template times clean-window channel RMS times 10**(-snr_db/20)",
+  "sharing": "Identical noisy input across all nine checkpoints per level; same template across levels",
+  "zero_power": "Unperturbed",
+  "postprocess": "Cast to float32; no clipping or restandardization",
+  "baseline": "Recompute clean scores and confirm against the saved official-test metrics",
+  "comparison": "100 * (clean - noisy) paired within checkpoint, then mean and sample SD over 3 seeds",
+  "freeze_sha256": "313f0a1076eb44f9d2b64d9053656c8956d171aa0e8b52b409b3977ff66d8ec2",
+  "dataset_fingerprint": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd",
+  "official_test_sha256": "b53975514b8a70faff821e4e7584e608165e258859c0b9914781d0ea003cfed9",
+  "evaluator_sha256": "b6acb321e31a390ac18181e1e67b520738160cf23a4100ebd4bb92cb1bd1570b",
+  "planned_at_utc": "2026-11-09T14:06:02.079011+00:00"
+}
