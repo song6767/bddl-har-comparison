@@ -44,36 +44,6 @@ def summarize(runs_root="runs/smoke", output_dir="reports/smoke"):
                "data_metadata_sha256": records[0]["data_metadata_sha256"], "runs": rows})
     config = json.loads((paths[0].parent / "config.json").read_text(encoding="utf-8"))
     write_json(output / "data_manifest.json", config["data_metadata"])
-    stage = records[0]["stage"]
-    lines = ["# 三个时序模型的验证集运行记录", "",
-             f"阶段：`{stage}`。所有指标均来自验证集；官方测试集未进行预测或评分。", "",
-             "smoke 阶段仅证明数据、训练、保存和评估流程能够运行。单种子短训练结果不能作为最终模型排名。",
-             "验证集同时用于选择最佳轮次，因此这里不是独立测试结果。", "",
-             "| 模型 | 种子 | 完成轮数 | 最佳轮次 | 参数量 | 验证准确率 | 验证 Macro-F1 | 训练流程秒数 |",
-             "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
-    for row in rows:
-        lines.append(f"| {row['model'].upper()} | {row['seed']} | {row['epochs_completed']} | "
-                     f"{row['best_epoch']} | {row['parameters']:,} | {row['val_accuracy']:.2%} | "
-                     f"{row['val_macro_f1']:.4f} | {row['fit_seconds']:.2f} |")
-    first = records[0]
-    lines.extend(["", f"设备：{first['environment']['gpu_name'] or first['environment']['device']}。",
-                  f"训练集 {first['train_samples']:,} 窗，验证集 {first['val_samples']:,} 窗。",
-                  "标准化统计量只使用训练集。不同集合的受试者互不重叠。", "",
-                  "训练流程秒数包含每轮验证和最佳检查点写入，不包含数据加载、绘图和启动进程。",
-                  "显存记录为 PyTorch 分配器的峰值，不包括驱动、上下文与其他程序；推理时间为驻留设备批次的前向计算，",
-                  "不包含数据传输，按批次均摊的时间不等于单样本延迟。短训练计时仅作流程记录。", "",
-                  "## 结果文件", "",
-                  "- [汇总 CSV](summary.csv)", "- [汇总 JSON](summary.json)",
-                  "- [数据来源和人员划分](data_manifest.json)"])
-    for row in rows:
-        folder = f"{row['model']}/seed_{row['seed']}"
-        lines.extend([f"- {row['model'].upper()}，种子 {row['seed']}："
-                      f"[完整指标]({folder}/metrics.json)、[逐轮记录]({folder}/history.csv)、"
-                      f"[训练曲线]({folder}/learning_curves.png)、[混淆矩阵]({folder}/confusion_matrix.png)"])
-    lines.extend(["", "## 后续实验", "",
-                  "先完成相同调参预算下的验证实验，再冻结各模型配置，进行三个随机种子的正式训练。",
-                  "最终统一评估官方测试集，并按预先确定的方案分析效率和噪声敏感性。", ""])
-    (output / "README.md").write_text("\n".join(lines), encoding="utf-8")
     print(f"Exported {len(records)} validation runs to {output}; datasets and weights excluded.", flush=True)
 
 

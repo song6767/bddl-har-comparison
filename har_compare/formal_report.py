@@ -18,7 +18,6 @@ from .runtime import write_json
 
 
 CLASS_NAMES = ("Walk", "Upstairs", "Downstairs", "Sit", "Stand", "Lie")
-CLASS_NAMES_ZH = ("步行", "上楼", "下楼", "坐姿", "站姿", "躺卧")
 COLORS = ("#0072B2", "#D55E00", "#009E73")
 
 
@@ -185,104 +184,12 @@ def plot_efficiency(output, summary, device_name, batch_size):
     plt.close(fig)
 
 
-def format_stats(values, scale=1, decimals=2):
-    if values is None:
-        return "—"
-    return (f"{scale * values['mean']:.{decimals}f} ± "
-            f"{scale * values['sample_sd']:.{decimals}f}")
-
-
 def major_confusion(matrix):
     # Count a pair in both directions. Report against all incorrect predictions.
     pairs = np.triu(matrix + matrix.T, k=1)
     i, j = np.unravel_index(pairs.argmax(), pairs.shape)
     errors = int(matrix.sum() - matrix.trace())
     return {"classes": [int(i), int(j)], "count": int(pairs[i, j]), "total_errors": errors}
-
-
-def write_readme(output, tuning, rows, summary, confusions, manifest, protocol, device_name):
-    ranked = sorted(MODELS, key=lambda model: summary[model]["test_macro_f1"]["mean"], reverse=True)
-    first, second = ranked[:2]
-    gap = 100 * (summary[first]["test_macro_f1"]["mean"] - summary[second]["test_macro_f1"]["mean"])
-    first_wins = sum(max((row for row in rows if row["seed"] == seed), key=lambda row: row["test_macro_f1"])["model"]
-                     == first for seed in SEEDS)
-    lines = ["# CNN RNN 和 LSTM 的正式比较", "",
-             f"在 UCI HAR 官方测试集上，{first.upper()} 的三种子平均 Macro-F1 最高，"
-             f"比第二位的 {second.upper()} 高 {gap:.2f} 个百分点。"
-             f"{first.upper()} 在 {first_wins}/{len(SEEDS)} 个种子上的 Macro-F1 最高。", "",
-             "## 数据和模型选择", ""]
-    sizes, people = manifest["sample_counts"], manifest["split_subjects"]
-    lines.append(f"训练、验证和官方测试分别使用 {len(people['train'])}、{len(people['val'])} 和 "
-                 f"{len(people['test'])} 名互不重叠的受试者，对应 {sizes['train']:,}、{sizes['val']:,} 和 "
-                 f"{sizes['test']:,} 个窗口。每个窗口有 128 个时间点和 9 个信号通道。标准化统计量只用训练集估计。")
-    lines.extend(["", f"每个模型用同一个种子 {protocol['tuning_seed']} 尝试三个学习率。训练最多 {protocol['max_epochs']} 轮，"
-                  f"按验证 Macro-F1 选出最优轮次，连续 {protocol['patience']} 轮无提升则早停。"
-                  "验证分数相同则选择较小的学习率。三个模型采用相同批量大小、优化器和梯度裁剪阈值。选定学习率后使用种子 "
-                  "42、43、44 各自重新训练。9 个检查点全部记录哈希后，再统一评估官方测试集。", "",
-                  "| 模型 | 学习率 | 验证准确率 | 验证 Macro-F1 | 最佳轮 / 完成轮 | 选中 |",
-                  "| --- | ---: | ---: | ---: | ---: | --- |"])
-    for row in tuning:
-        lines.append(f"| {row['model'].upper()} | {row['learning_rate']:g} | {row['val_accuracy']:.2%} | "
-                     f"{row['val_macro_f1']:.4f} | {row['best_epoch']} / {row['epochs_completed']} | "
-                     f"{'是' if row['selected'] else ''} |")
-    largest_rate = max(LEARNING_RATES)
-    if all(entry["learning_rate"] == largest_rate for entry in summary.values()):
-        lines.extend(["", f"三个模型均选中候选范围的上边界 `{largest_rate:g}`，学习率结论限于本次搜索网格。"])
-    lines.extend(["", "## 官方测试集", "",
-                  "表中为 3 次正式训练的均值 ± 样本标准差。准确率和 Macro-F1 均用百分数表示。", "",
-                  "| 模型 | 学习率 | 验证 Macro-F1 (%) | 测试准确率 (%) | 测试 Macro-F1 (%) |",
-                  "| --- | ---: | ---: | ---: | ---: |"])
-    for model in MODELS:
-        entry = summary[model]
-        lines.append(f"| {model.upper()} | {entry['learning_rate']:g} | {format_stats(entry['val_macro_f1'], 100)} | "
-                     f"{format_stats(entry['test_accuracy'], 100)} | {format_stats(entry['test_macro_f1'], 100)} |")
-    val_best = max(MODELS, key=lambda model: summary[model]["val_macro_f1"]["mean"])
-    lines.extend(["", "![三种子官方测试指标](test_scores.png)", "",
-                  "三次评估共用同一批测试受试者，标准差描述训练随机性。窗口有重叠，受试者也只有 9 名，"
-                  "因此这些结果的适用范围限于该数据集的固定划分和采集条件。", ""])
-    if val_best != first:
-        lines.extend([f"{val_best.upper()} 的平均验证 Macro-F1 最高，{first.upper()} 的平均测试 Macro-F1 最高。"
-                      "验证和测试来自不同受试者，且验证分数参与了轮次选择。", ""])
-    lines.extend(["## 主要混淆", "", "![官方测试集混淆矩阵](test_confusion.png)", "",
-                  "矩阵先将三个种子的计数相加，再按真实类别归一化。每个测试窗口重复计入三次。各模型最常见的双向混淆如下。", ""])
-    for model in MODELS:
-        item = confusions[model]
-        if item["total_errors"]:
-            names = "与".join(CLASS_NAMES_ZH[i] for i in item["classes"])
-            lines.append(f"- {model.upper()} 的{names}混淆合计 {item['count']} 次，"
-                         f"占该模型 {item['total_errors']} 次错误的 {item['count'] / item['total_errors']:.1%}。")
-    batch_size = protocol["batch_size"]
-    lines.extend(["", "## 计算效率", "",
-                  f"三个模型均在 {device_name} 上顺序运行。参数量来自模型本身，其余指标为三个种子的均值 ± 样本标准差。", "",
-                  f"| 模型 | 参数量 | 完成轮数 | 总训练秒数 | 每轮秒数 | {batch_size} 样本前向毫秒 | 峰值分配显存 MiB |",
-                  "| --- | ---: | ---: | ---: | ---: | ---: | ---: |"])
-    for model in MODELS:
-        entry = summary[model]
-        lines.append(f"| {model.upper()} | {entry['parameters']:,} | {format_stats(entry['epochs_completed'], decimals=1)} | "
-                     f"{format_stats(entry['fit_seconds'])} | {format_stats(entry['fit_seconds_per_epoch'], decimals=3)} | "
-                     f"{format_stats(entry['inference_batch_ms'], decimals=3)} | "
-                     f"{format_stats(entry['peak_torch_allocated_mib'], decimals=1)} |")
-    fastest = min(MODELS, key=lambda model: summary[model]["fit_seconds_per_epoch"]["mean"])
-    if fastest != first:
-        ratio = summary[first]["fit_seconds_per_epoch"]["mean"] / summary[fastest]["fit_seconds_per_epoch"]["mean"]
-        lines.extend(["", f"{fastest.upper()} 的平均每轮训练耗时最短。测试 Macro-F1 最高的 {first.upper()} 每轮耗时约为其 {ratio:.2f} 倍。"])
-    else:
-        next_fastest = min((model for model in MODELS if model != fastest),
-                           key=lambda model: summary[model]["fit_seconds_per_epoch"]["mean"])
-        reduction = 1 - summary[fastest]["fit_seconds_per_epoch"]["mean"] / summary[next_fastest]["fit_seconds_per_epoch"]["mean"]
-        lines.extend(["", f"{fastest.upper()} 的平均每轮训练耗时最短，比第二快的 {next_fastest.upper()} 少约 {reduction:.0%}。"])
-    lines.extend(["", "![每轮训练耗时、批推理耗时与峰值显存](efficiency.png)", "",
-                  "总训练时间包含每轮验证与最佳权重保存。每轮秒数按各次训练的总耗时除以完成轮数。"
-                  f"批前向从验证集取 {batch_size} 个样本，放入运行设备后预热 5 次并计时 30 次。"
-                  "CUDA 计时使用同步，峰值显存采用 PyTorch 分配器统计。CPU 运行的显存项记为 —。", "",
-                  "![正式训练的验证集曲线](validation_curves.png)", "",
-                  "## 复核材料", "",
-                  "- [逐次正式运行与测试结果](per_run.csv)", "- [完整学习率搜索表](tuning.csv)",
-                  "- [机器可读汇总](summary.json)", "- [预设实验配置](protocol.json)",
-                  "- [配置选择记录](selection.json)", "- [正式检查点哈希及冻结记录](freeze.json)",
-                  "- [数据划分与标准化信息](data_manifest.json)",
-                  "- [正式训练历史](training/) · [测试明细](test/) · [调参原始记录](tuning/)", ""])
-    (output / "README.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 def build_report(root, output):
@@ -333,7 +240,6 @@ def build_report(root, output):
     plot_confusion(output, matrices)
     plot_learning_curves(output, histories)
     plot_efficiency(output, summary, device_name, protocol["batch_size"])
-    write_readme(output, tuning, rows, summary, confusions, manifest, protocol, device_name)
     print(f"Published {len(tuning)} tuning trials and {len(rows)} formal evaluations to {output}")
 
 

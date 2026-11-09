@@ -21,7 +21,6 @@ METRICS = ("accuracy", "macro_f1")
 LABELS = ("Accuracy", "Macro-F1")
 COLORS = ("#0072B2", "#D55E00", "#009E73")
 MARKERS = ("o", "s", "^")
-ACTIVITIES_ZH = ("走路", "上楼", "下楼", "坐姿", "站姿", "躺卧")
 
 
 def describe(values):
@@ -132,87 +131,6 @@ def plot_drops(output, rows, summary, levels):
     plt.close(fig)
 
 
-def fmt(stats, signed=False):
-    value = f"{stats['mean']:+.2f}" if signed else f"{stats['mean']:.2f}"
-    return f"{value} ± {stats['sample_sd']:.2f}"
-
-
-def findings(summary, levels):
-    ranks = {}
-    for metric in METRICS:
-        ranks[metric] = [
-            sorted(MODELS, key=lambda model: summary[model]["clean"][metric]["mean"], reverse=True)
-        ] + [
-            sorted(MODELS, key=lambda model: summary[model]["noisy"][str(level)][metric]["score_pct"]["mean"],
-                   reverse=True) for level in levels
-        ]
-    notes = []
-    if ranks["accuracy"] == ranks["macro_f1"] and all(rank == ranks["accuracy"][0] for rank in ranks["accuracy"]):
-        ranking = "、".join(model.upper() for model in ranks["accuracy"][0])
-        notes.append(f"准确率与 Macro-F1 的均值在三种条件下均按 {ranking} 从高到低排列。")
-    stronger = min(levels)
-    f1 = {model: summary[model]["noisy"][str(stronger)]["macro_f1"]["paired_drop_pp"] for model in MODELS}
-    best = min(f1, key=lambda model: f1[model]["mean"])
-    worst = max(f1, key=lambda model: f1[model]["mean"])
-    notes.append(f"{stronger} dB 下，{best.upper()} 的平均 Macro-F1 降幅最小"
-                 f"（{f1[best]['mean']:+.2f} 个百分点），{worst.upper()} 最大（{f1[worst]['mean']:+.2f}）。")
-    if all(value["sample_sd"] > abs(value["mean"]) for value in f1.values()):
-        notes[-1] += "三个模型的种子间降幅标准差均大于各自的平均降幅，模型间的鲁棒性差异应按描述性结果解读。"
-
-    clean = np.asarray(summary["cnn"]["confusion_counts_summed_across_seeds"]["clean"])
-    noisy = np.asarray(summary["cnn"]["confusion_counts_summed_across_seeds"][str(stronger)])
-    recalls_drop = 100 * (clean.diagonal() / clean.sum(axis=1) - noisy.diagonal() / noisy.sum(axis=1))
-    activity = int(np.argmax(recalls_drop))
-    accuracy_drop = summary["cnn"]["noisy"][str(stronger)]["accuracy"]["paired_drop_pp"]["mean"]
-    if recalls_drop[activity] > max(abs(accuracy_drop), 0.1):
-        notes.append(f"CNN 在 {stronger} dB 下的整体准确率平均变化为 {-accuracy_drop:+.2f} 个百分点，"
-                     f"但合并三个种子后，{ACTIVITIES_ZH[activity]}的召回率下降 {recalls_drop[activity]:.2f} 个百分点。"
-                     "整体指标掩盖了部分活动类别的变化。")
-    return notes
-
-
-def write_readme(output, data, levels, summary):
-    protocol = data["protocol"]
-    lines = [
-        "# 冻结模型的人工噪声鲁棒性实验", "",
-        f"使用原有 9 个冻结检查点，在 UCI HAR 官方测试集的 {data['test_subjects']} 名受试者、"
-        f"{data['test_windows']:,} 个窗口上评估。重新计算的干净输入结果已与原正式结果核对。"
-        "[干净输入正式实验](../formal/README.md)", "",
-        f"用 {protocol['generator']} 和固定噪声种子 `{protocol['noise_seed']}` 生成一个高斯噪声模板。"
-        "在标准化后的输入空间内，对每个窗口的每个通道沿 128 个时间点计算均方功率（含直流分量），"
-        "按目标信噪比缩放噪声。零功率通道保持原值。两档共用同一噪声模板，各档输入由全部模型和训练种子共用。"
-        "加噪后的输入转成 float32，无裁剪和二次标准化。", "",
-        "## 分数和配对降幅", "",
-        "数值为三个种子的均值 ± 样本标准差。分数用百分数表示。降幅按同一检查点的干净分数减去带噪分数，单位为百分点。"
-        "负值表示在这一噪声实现下，平均分数略有上升。", "",
-        "| 模型 | 条件 | 准确率（%） | Macro-F1（%） | 准确率降幅（百分点） | Macro-F1 降幅（百分点） |",
-        "| --- | --- | ---: | ---: | ---: | ---: |",
-    ]
-    for model in MODELS:
-        item = summary[model]
-        clean = [fmt(item["clean"][metric]) for metric in METRICS]
-        lines.append(f"| {model.upper()} | 干净输入 | {clean[0]} | {clean[1]} | — | — |")
-        for snr in levels:
-            noisy = item["noisy"][str(snr)]
-            scores = [fmt(noisy[metric]["score_pct"]) for metric in METRICS]
-            drops = [fmt(noisy[metric]["paired_drop_pp"], signed=True) for metric in METRICS]
-            lines.append(f"| {model.upper()} | {snr} dB | {scores[0]} | {scores[1]} | {drops[0]} | {drops[1]} |")
-    lines.extend(["", "![不同噪声条件下的准确率和 Macro-F1](noise_scores.png)", "",
-                  "![配对分数降幅。浅色点是单个训练种子的降幅，误差线表示样本标准差。](noise_drops.png)",
-                  "", "## 观察与适用范围", ""])
-    lines.extend(f"- {note}" for note in findings(summary, levels))
-    lines.extend([
-        "", "测试受试者和噪声实现固定，标准差只描述训练种子之间的变化。"
-        "结果对应这两档窗口级人工加性噪声，推广到其他噪声实现、受试者或真实传感器干扰仍需额外实验。", "",
-        "## 复核材料", "",
-        "- [逐检查点分数和配对降幅](per_run.csv)",
-        "- [模型汇总与混淆矩阵计数](summary.json)",
-        "- [原始评估记录及校验值](results.json)",
-        "- [预先固定的噪声协议](protocol.json)", "",
-    ])
-    (output / "README.md").write_text("\n".join(lines), encoding="utf-8")
-
-
 def build_report(source, output):
     if output.exists():
         raise FileExistsError(f"Report already exists at {output}. Choose a new output directory.")
@@ -238,7 +156,6 @@ def build_report(source, output):
         shutil.copyfile(source.with_name("protocol.json"), staged / "protocol.json")
         plot_scores(staged, summary, levels)
         plot_drops(staged, rows, summary, levels)
-        write_readme(staged, data, levels, summary)
         staged.rename(output)
     print(f"Published {len(rows)} paired comparisons to {output}")
 
