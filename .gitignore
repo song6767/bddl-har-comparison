@@ -1,0 +1,20 @@
+# Local datasets and training artifacts are reproducible, not source files.
+/data/raw/
+/data/processed/
+/runs/
+/tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.env.*
+!.env.example
+*.pt
+*.pth
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

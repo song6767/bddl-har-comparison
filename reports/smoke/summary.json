@@ -1,0 +1,43 @@
+{
+  "stage": "smoke",
+  "test_evaluated": false,
+  "data_metadata_sha256": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd",
+  "runs": [
+    {
+      "model": "cnn",
+      "seed": 42,
+      "best_epoch": 3,
+      "epochs_completed": 5,
+      "parameters": 32710,
+      "val_accuracy": 0.9721485411140584,
+      "val_macro_f1": 0.9736064440891329,
+      "fit_seconds": 1.9254349999973783,
+      "peak_torch_allocated_mib": 73.38330078125,
+      "inference_batch_ms": 0.286959999842414
+    },
+    {
+      "model": "lstm",
+      "seed": 42,
+      "best_epoch": 5,
+      "epochs_completed": 5,
+      "parameters": 29606,
+      "val_accuracy": 0.9542440318302388,
+      "val_macro_f1": 0.9546629542389417,
+      "fit_seconds": 2.7912796000018716,
+      "peak_torch_allocated_mib": 147.3076171875,
+      "inference_batch_ms": 0.8790100003049398
+    },
+    {
+      "model": "rnn",
+      "seed": 42,
+      "best_epoch": 4,
+      "epochs_completed": 5,
+      "parameters": 33974,
+      "val_accuracy": 0.9104774535809018,
+      "val_macro_f1": 0.9108794589361304,
+      "fit_seconds": 2.912184000000707,
+      "peak_torch_allocated_mib": 167.81884765625,
+      "inference_batch_ms": 0.797423333763921
+    }
+  ]
+}
