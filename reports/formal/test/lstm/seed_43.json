@@ -1,0 +1,112 @@
+{
+  "model": "lstm",
+  "seed": 43,
+  "split": "test",
+  "stage": "formal",
+  "checkpoint_epoch": 5,
+  "checkpoint_sha256": "424b4fdb39981abbdf4c3fd1d79aecdc9ac1e4a36632c8ef5d433be56bab7b39",
+  "freeze_sha256": "313f0a1076eb44f9d2b64d9053656c8956d171aa0e8b52b409b3977ff66d8ec2",
+  "data_metadata_sha256": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd",
+  "data_fingerprint_schema_version": 1,
+  "test_evaluated": true,
+  "environment": {
+    "python": "3.10.22",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "torch": "2.6.0+cu124",
+    "numpy": "1.23.5",
+    "cuda_build": "12.4",
+    "cudnn": 90100,
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3050",
+    "cpu_threads": 4,
+    "deterministic_algorithms": true
+  },
+  "metrics": {
+    "accuracy": 0.8900576857821514,
+    "macro_f1": 0.8924150518762728,
+    "per_class_precision": [
+      0.9254302103250478,
+      0.9087136929460581,
+      0.9596199524940617,
+      0.7668711656441718,
+      0.7996357012750456,
+      1.0
+    ],
+    "per_class_recall": [
+      0.9758064516129032,
+      0.9299363057324841,
+      0.9619047619047619,
+      0.7637474541751528,
+      0.825187969924812,
+      0.8994413407821229
+    ],
+    "per_class_f1": [
+      0.9499509322865555,
+      0.919202518363064,
+      0.9607609988109393,
+      0.7653061224489796,
+      0.8122109158186864,
+      0.9470588235294117
+    ],
+    "support": [
+      496,
+      471,
+      420,
+      491,
+      532,
+      537
+    ],
+    "confusion_matrix": [
+      [
+        484,
+        1,
+        11,
+        0,
+        0,
+        0
+      ],
+      [
+        30,
+        438,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        11,
+        404,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        3,
+        1,
+        375,
+        110,
+        0
+      ],
+      [
+        2,
+        2,
+        2,
+        87,
+        439,
+        0
+      ],
+      [
+        0,
+        27,
+        0,
+        27,
+        0,
+        483
+      ]
+    ],
+    "n_samples": 2947,
+    "loss": 0.2620005035683801
+  }
+}

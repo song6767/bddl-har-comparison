@@ -1,0 +1,333 @@
+{
+  "test_evaluated": true,
+  "data_metadata_sha256": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd",
+  "tuning_seed": 41,
+  "formal_seeds": [
+    42,
+    43,
+    44
+  ],
+  "test_windows_per_seed": 2947,
+  "test_subjects": 9,
+  "models": {
+    "cnn": {
+      "learning_rate": 0.003,
+      "parameters": 32710,
+      "val_accuracy": {
+        "mean": 0.9694960212201592,
+        "sample_sd": 0.0030388432990423467
+      },
+      "val_macro_f1": {
+        "mean": 0.9704276708009796,
+        "sample_sd": 0.003461083472604645
+      },
+      "test_accuracy": {
+        "mean": 0.9194661237416581,
+        "sample_sd": 0.024510047697376993
+      },
+      "test_macro_f1": {
+        "mean": 0.9194138598341718,
+        "sample_sd": 0.024988160863218017
+      },
+      "epochs_completed": {
+        "mean": 13.666666666666666,
+        "sample_sd": 4.509249752822894
+      },
+      "fit_seconds": {
+        "mean": 4.623740766667955,
+        "sample_sd": 1.3779976813757246
+      },
+      "fit_seconds_per_epoch": {
+        "mean": 0.3414281076720775,
+        "sample_sd": 0.01648681512195636
+      },
+      "inference_batch_ms": {
+        "mean": 0.2946355556357756,
+        "sample_sd": 0.00986441656925746
+      },
+      "peak_torch_allocated_mib": {
+        "mean": 73.38330078125,
+        "sample_sd": 0.0
+      }
+    },
+    "rnn": {
+      "learning_rate": 0.003,
+      "parameters": 33974,
+      "val_accuracy": {
+        "mean": 0.9794429708222813,
+        "sample_sd": 0.0034457244182404864
+      },
+      "val_macro_f1": {
+        "mean": 0.9794398499916701,
+        "sample_sd": 0.003492226665853513
+      },
+      "test_accuracy": {
+        "mean": 0.904196357878068,
+        "sample_sd": 0.005216537748037651
+      },
+      "test_macro_f1": {
+        "mean": 0.9044249614218889,
+        "sample_sd": 0.0060686602904295416
+      },
+      "epochs_completed": {
+        "mean": 21.333333333333332,
+        "sample_sd": 3.5118845842842465
+      },
+      "fit_seconds": {
+        "mean": 11.619910300005964,
+        "sample_sd": 1.922913345153116
+      },
+      "fit_seconds_per_epoch": {
+        "mean": 0.5446556431431248,
+        "sample_sd": 0.002118045110669367
+      },
+      "inference_batch_ms": {
+        "mean": 0.8992755555987566,
+        "sample_sd": 0.09054357947594717
+      },
+      "peak_torch_allocated_mib": {
+        "mean": 167.81884765625,
+        "sample_sd": 0.0
+      }
+    },
+    "lstm": {
+      "learning_rate": 0.003,
+      "parameters": 29606,
+      "val_accuracy": {
+        "mean": 0.9739168877099912,
+        "sample_sd": 0.006267659981767362
+      },
+      "val_macro_f1": {
+        "mean": 0.9733998544741134,
+        "sample_sd": 0.008097396973672902
+      },
+      "test_accuracy": {
+        "mean": 0.8949213889831467,
+        "sample_sd": 0.007559735238776997
+      },
+      "test_macro_f1": {
+        "mean": 0.8960937934267045,
+        "sample_sd": 0.007100735576311798
+      },
+      "epochs_completed": {
+        "mean": 12.333333333333334,
+        "sample_sd": 0.5773502691896257
+      },
+      "fit_seconds": {
+        "mean": 6.7128334333344055,
+        "sample_sd": 0.4966517676610828
+      },
+      "fit_seconds_per_epoch": {
+        "mean": 0.5438372615385444,
+        "sample_sd": 0.014648463872557752
+      },
+      "inference_batch_ms": {
+        "mean": 1.0410911112558097,
+        "sample_sd": 0.03147586927215182
+      },
+      "peak_torch_allocated_mib": {
+        "mean": 147.3076171875,
+        "sample_sd": 0.0
+      }
+    }
+  },
+  "environment": {
+    "python": "3.10.22",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "torch": "2.6.0+cu124",
+    "numpy": "1.23.5",
+    "cuda_build": "12.4",
+    "cudnn": 90100,
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3050",
+    "cpu_threads": 4,
+    "deterministic_algorithms": true
+  },
+  "test_labels": [
+    "WALKING",
+    "WALKING_UPSTAIRS",
+    "WALKING_DOWNSTAIRS",
+    "SITTING",
+    "STANDING",
+    "LAYING"
+  ],
+  "confusion_count_scope": "Same test windows scored by each of three checkpoints per model",
+  "test_confusion_counts_sum_across_seeds": {
+    "cnn": [
+      [
+        1399,
+        22,
+        67,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        1327,
+        76,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        18,
+        1242,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        27,
+        0,
+        1163,
+        280,
+        3
+      ],
+      [
+        1,
+        1,
+        0,
+        183,
+        1411,
+        0
+      ],
+      [
+        0,
+        22,
+        2,
+        0,
+        0,
+        1587
+      ]
+    ],
+    "rnn": [
+      [
+        1402,
+        28,
+        58,
+        0,
+        0,
+        0
+      ],
+      [
+        50,
+        1275,
+        77,
+        8,
+        3,
+        0
+      ],
+      [
+        1,
+        15,
+        1242,
+        2,
+        0,
+        0
+      ],
+      [
+        4,
+        11,
+        5,
+        1103,
+        349,
+        1
+      ],
+      [
+        0,
+        1,
+        2,
+        232,
+        1361,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1611
+      ]
+    ],
+    "lstm": [
+      [
+        1357,
+        48,
+        72,
+        3,
+        3,
+        5
+      ],
+      [
+        35,
+        1325,
+        46,
+        3,
+        4,
+        0
+      ],
+      [
+        10,
+        22,
+        1228,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        4,
+        3,
+        1129,
+        334,
+        0
+      ],
+      [
+        3,
+        2,
+        2,
+        256,
+        1333,
+        0
+      ],
+      [
+        0,
+        44,
+        0,
+        27,
+        0,
+        1540
+      ]
+    ]
+  },
+  "major_confusions": {
+    "cnn": {
+      "classes": [
+        3,
+        4
+      ],
+      "count": 463,
+      "total_errors": 712
+    },
+    "rnn": {
+      "classes": [
+        3,
+        4
+      ],
+      "count": 581,
+      "total_errors": 847
+    },
+    "lstm": {
+      "classes": [
+        3,
+        4
+      ],
+      "count": 590,
+      "total_errors": 929
+    }
+  }
+}

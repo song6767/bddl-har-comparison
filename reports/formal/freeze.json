@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "dataset_fingerprint": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd",
+  "official_test_sha256": "b53975514b8a70faff821e4e7584e608165e258859c0b9914781d0ea003cfed9",
+  "protocol_sha256": "57ecaaf9df9483c807ccc4bef78268e5d2f73673e5993b3ffebd798f22301fea",
+  "selection_sha256": "96d877631b56ae18bb2764d84721676bc8aa5b33d1311b07664458f0c61207fc",
+  "checkpoints": [
+    {
+      "model": "cnn",
+      "seed": 42,
+      "learning_rate": 0.003,
+      "epoch": 6,
+      "path": "training/cnn/seed_42/best.pt",
+      "sha256": "713331cb51d8b9ba8d7aa5f962551fa2424ac8ccc7aea5d78f7c9d98b150d81e",
+      "metrics_path": "training/cnn/seed_42/metrics.json",
+      "metrics_sha256": "d7edee9fe8d52c696faa6acf5486dffa28e17b86329ef853799acd570c7433e1"
+    },
+    {
+      "model": "cnn",
+      "seed": 43,
+      "learning_rate": 0.003,
+      "epoch": 1,
+      "path": "training/cnn/seed_43/best.pt",
+      "sha256": "2b3e2279594470f50abaa3fbec5b4c8c067dd5fd99f6e2c09bc65b6f18abdf5e",
+      "metrics_path": "training/cnn/seed_43/metrics.json",
+      "metrics_sha256": "b35564a68eb2415e5fe246cc2de8b81068ad50f2e9a45ef79476e4c2073586ee"
+    },
+    {
+      "model": "cnn",
+      "seed": 44,
+      "learning_rate": 0.003,
+      "epoch": 10,
+      "path": "training/cnn/seed_44/best.pt",
+      "sha256": "0de53155b341a9d94c9d6ebc66b3d98a7f3cc3f5e8e9916c210d3589f48f835d",
+      "metrics_path": "training/cnn/seed_44/metrics.json",
+      "metrics_sha256": "1f5c10ab5f4d851fed0d7d11a3493677fc46c11e2f92f4de198d9ed5e430c846"
+    },
+    {
+      "model": "rnn",
+      "seed": 42,
+      "learning_rate": 0.003,
+      "epoch": 10,
+      "path": "training/rnn/seed_42/best.pt",
+      "sha256": "762975ee2a258c7077cb45015cd440a2ff641de8936a23eaebfa67e663314fdc",
+      "metrics_path": "training/rnn/seed_42/metrics.json",
+      "metrics_sha256": "1ac0b3fe80dbba0d7800c9ec0ec12c991deab286fc8ae6b975e5fb2a7227c5ea"
+    },
+    {
+      "model": "rnn",
+      "seed": 43,
+      "learning_rate": 0.003,
+      "epoch": 17,
+      "path": "training/rnn/seed_43/best.pt",
+      "sha256": "162647cb9bb9e32a9f6b134668bce1fbaadc29cb135f2ca135490fdcb4987aa3",
+      "metrics_path": "training/rnn/seed_43/metrics.json",
+      "metrics_sha256": "7f197b21431299cd08a5cf24435da323bc766c11b263df954c8c741283e6560e"
+    },
+    {
+      "model": "rnn",
+      "seed": 44,
+      "learning_rate": 0.003,
+      "epoch": 13,
+      "path": "training/rnn/seed_44/best.pt",
+      "sha256": "8cfdd2186d3c2c0e7d1314395fd2ee5b4de7aa83fa255f22fa44792ee8f46f71",
+      "metrics_path": "training/rnn/seed_44/metrics.json",
+      "metrics_sha256": "d46799c4c34304267bc1167ae4fc42585be2d5386cfcb9c62fcadb225808e0c1"
+    },
+    {
+      "model": "lstm",
+      "seed": 42,
+      "learning_rate": 0.003,
+      "epoch": 4,
+      "path": "training/lstm/seed_42/best.pt",
+      "sha256": "b0507e291e44c397544195fd89a8ff00e863869f665988eaa8c9ef65cb470c7e",
+      "metrics_path": "training/lstm/seed_42/metrics.json",
+      "metrics_sha256": "b4fcd9071dbd29c0994a6874462b02a42a5979f9b4fd35761910f8e88aac3f6b"
+    },
+    {
+      "model": "lstm",
+      "seed": 43,
+      "learning_rate": 0.003,
+      "epoch": 5,
+      "path": "training/lstm/seed_43/best.pt",
+      "sha256": "424b4fdb39981abbdf4c3fd1d79aecdc9ac1e4a36632c8ef5d433be56bab7b39",
+      "metrics_path": "training/lstm/seed_43/metrics.json",
+      "metrics_sha256": "31cf4b67c5fb99dd906dd68845481333053fa8fd09fa39993f40ac1530aeb335"
+    },
+    {
+      "model": "lstm",
+      "seed": 44,
+      "learning_rate": 0.003,
+      "epoch": 4,
+      "path": "training/lstm/seed_44/best.pt",
+      "sha256": "feea595a0953e2cc6b2c7f7a9a26a4eaafc41094e8434a58845c489b580d87be",
+      "metrics_path": "training/lstm/seed_44/metrics.json",
+      "metrics_sha256": "3b59cf8f8c8dae58b3350cfac0f1cb9f2e5c17393aea4d4e6defd9a305b532a9"
+    }
+  ],
+  "frozen_at_utc": "2026-11-09T13:53:29.621381+00:00"
+}

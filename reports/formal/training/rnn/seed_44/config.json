@@ -1,0 +1,156 @@
+{
+  "config": {
+    "model": "rnn",
+    "data_dir": "data\\processed",
+    "output_dir": "runs\\formal_v1\\training\\rnn\\seed_44",
+    "epochs": 50,
+    "seed": 44,
+    "batch_size": 64,
+    "device": "cuda",
+    "lr": 0.003,
+    "patience": 8,
+    "dropout": 0.2,
+    "threads": 4,
+    "stage": "formal",
+    "overwrite": false,
+    "gradient_clip_norm": 1.0,
+    "optimizer": "Adam",
+    "selection_metric": "val_macro_f1",
+    "test_evaluated": false,
+    "model_input_shape": [
+      128,
+      9
+    ],
+    "pooling": "temporal mean",
+    "num_workers": 0,
+    "parameters": 33974
+  },
+  "environment": {
+    "python": "3.10.22",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "torch": "2.6.0+cu124",
+    "numpy": "1.23.5",
+    "cuda_build": "12.4",
+    "cudnn": 90100,
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3050",
+    "cpu_threads": 4,
+    "deterministic_algorithms": true
+  },
+  "started_at_utc": "2026-11-09T13:52:28.556579+00:00",
+  "data_metadata": {
+    "schema_version": 1,
+    "source_url": "https://archive.ics.uci.edu/static/public/240/human%2Bactivity%2Brecognition%2Busing%2Bsmartphones.zip",
+    "source_page": "https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones",
+    "dataset_doi": "10.24432/C54S4K",
+    "dataset_license": "CC BY 4.0",
+    "archive_sha256": "c00b803081a5c797cd5e4b83700a9810b38d53d9d84e01917e090e1fdbc81031",
+    "created_at_utc": "2026-11-09T13:41:16.129224+00:00",
+    "split_seed": 2026,
+    "split_subjects": {
+      "train": [
+        3,
+        5,
+        6,
+        7,
+        8,
+        11,
+        14,
+        15,
+        16,
+        17,
+        21,
+        22,
+        23,
+        27,
+        28,
+        29,
+        30
+      ],
+      "val": [
+        1,
+        19,
+        25,
+        26
+      ],
+      "test": [
+        2,
+        4,
+        9,
+        10,
+        12,
+        13,
+        18,
+        20,
+        24
+      ]
+    },
+    "sample_counts": {
+      "train": 5844,
+      "val": 1508,
+      "test": 2947
+    },
+    "channel_order": [
+      "body_acc_x",
+      "body_acc_y",
+      "body_acc_z",
+      "body_gyro_x",
+      "body_gyro_y",
+      "body_gyro_z",
+      "total_acc_x",
+      "total_acc_y",
+      "total_acc_z"
+    ],
+    "labels": [
+      "WALKING",
+      "WALKING_UPSTAIRS",
+      "WALKING_DOWNSTAIRS",
+      "SITTING",
+      "STANDING",
+      "LAYING"
+    ],
+    "shape_per_sample": [
+      128,
+      9
+    ],
+    "sample_rate_hz": 50,
+    "normalization": {
+      "fit_split": "train",
+      "axes": [
+        0,
+        1
+      ],
+      "ddof": 0,
+      "mean": [
+        -0.0004599084730990845,
+        -0.0002511177963256996,
+        -0.00013681389860493746,
+        -0.001354495092933359,
+        -0.0002839914319216182,
+        -0.00047681242296531416,
+        0.8116754064986715,
+        0.02001881070050143,
+        0.06024088636451712
+      ],
+      "std": [
+        0.19617156278030878,
+        0.12116421182102566,
+        0.10840784405176382,
+        0.3982345377549354,
+        0.3800268084706334,
+        0.2611577400210609,
+        0.4035680277885968,
+        0.3844432044037723,
+        0.3684208585061446
+      ]
+    },
+    "processed_sha256": {
+      "train": "8ba1c74df9d5fcba105c4fed2f02685664543f2f0c0c8f10431d48b4b947549a",
+      "val": "b511f0885944a535ff8508b5b3b71d5b1b757011bfb16db654e2f782579c60b9",
+      "test": "b53975514b8a70faff821e4e7584e608165e258859c0b9914781d0ea003cfed9"
+    },
+    "test_policy": "Prepared with training statistics, excluded from default loading/training/model selection."
+  },
+  "data_fingerprint_schema_version": 1,
+  "data_metadata_sha256": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd"
+}

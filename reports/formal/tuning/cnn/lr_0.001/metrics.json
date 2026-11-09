@@ -1,0 +1,184 @@
+{
+  "status": "completed",
+  "stage": "pilot",
+  "model": "cnn",
+  "seed": 41,
+  "best_epoch": 3,
+  "epochs_completed": 11,
+  "epochs_requested": 50,
+  "parameters": 32710,
+  "val_accuracy": 0.9688328912466844,
+  "val_macro_f1": 0.9703853319931265,
+  "validation": {
+    "accuracy": 0.9688328912466844,
+    "macro_f1": 0.9703853319931265,
+    "per_class_precision": [
+      1.0,
+      0.9861111111111112,
+      1.0,
+      0.8981818181818182,
+      1.0,
+      0.9463087248322147
+    ],
+    "per_class_recall": [
+      0.9964285714285714,
+      1.0,
+      0.9846938775510204,
+      0.9391634980988594,
+      0.9014598540145985,
+      1.0
+    ],
+    "per_class_f1": [
+      0.998211091234347,
+      0.993006993006993,
+      0.9922879177377892,
+      0.9182156133828996,
+      0.9481765834932822,
+      0.9724137931034482
+    ],
+    "support": [
+      280,
+      213,
+      196,
+      263,
+      274,
+      282
+    ],
+    "confusion_matrix": [
+      [
+        279,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        213,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        193,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        247,
+        0,
+        16
+      ],
+      [
+        0,
+        0,
+        0,
+        27,
+        247,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        282
+      ]
+    ],
+    "n_samples": 1508,
+    "loss": 0.10191495939397527
+  },
+  "train_samples": 5844,
+  "val_samples": 1508,
+  "train_subjects": [
+    3,
+    5,
+    6,
+    7,
+    8,
+    11,
+    14,
+    15,
+    16,
+    17,
+    21,
+    22,
+    23,
+    27,
+    28,
+    29,
+    30
+  ],
+  "val_subjects": [
+    1,
+    19,
+    25,
+    26
+  ],
+  "test_evaluated": false,
+  "fit_seconds": 3.6762363000016194,
+  "fit_time_scope": "Training, per-epoch validation and best checkpoint writes; excludes data loading and plotting.",
+  "peak_torch_allocated_mib": 73.38330078125,
+  "peak_torch_reserved_mib": 92.0,
+  "memory_scope": "PyTorch CUDA allocator peak during fitting; excludes driver/context and other applications.",
+  "inference": {
+    "batch_size": 64,
+    "repeats": 30,
+    "warmup_batches": 5,
+    "batch_ms": 0.258636666694656,
+    "amortized_ms_per_sample": 0.004041197917104,
+    "scope": "Model forward only, resident batch; excludes data loading and transfer. Amortized per-sample time is not batch-size-one latency."
+  },
+  "environment": {
+    "python": "3.10.22",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "torch": "2.6.0+cu124",
+    "numpy": "1.23.5",
+    "cuda_build": "12.4",
+    "cudnn": 90100,
+    "device": "cuda",
+    "gpu_name": "NVIDIA GeForce RTX 3050",
+    "cpu_threads": 4,
+    "deterministic_algorithms": true
+  },
+  "config": {
+    "model": "cnn",
+    "data_dir": "data\\processed",
+    "output_dir": "runs\\formal_v1\\tuning\\cnn\\lr_0.001",
+    "epochs": 50,
+    "seed": 41,
+    "batch_size": 64,
+    "device": "cuda",
+    "lr": 0.001,
+    "patience": 8,
+    "dropout": 0.2,
+    "threads": 4,
+    "stage": "pilot",
+    "overwrite": false,
+    "gradient_clip_norm": 1.0,
+    "optimizer": "Adam",
+    "selection_metric": "val_macro_f1",
+    "test_evaluated": false,
+    "model_input_shape": [
+      128,
+      9
+    ],
+    "pooling": "temporal mean",
+    "num_workers": 0,
+    "parameters": 32710
+  },
+  "data_metadata_sha256": "c0c9e4e5fb50b955ede2f117fda74f0aabe69d8668ca9708bd4a14100c8ad8fd",
+  "data_fingerprint_schema_version": 1,
+  "started_at_utc": "2026-11-09T13:49:22.014020+00:00",
+  "completed_at_utc": "2026-11-09T13:49:25.739911+00:00",
+  "interpretation": "Validation result used for model selection; not an independent test result. Smoke runs verify the pipeline and do not establish a model ranking."
+}

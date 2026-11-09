@@ -4,9 +4,9 @@
 
 公开仓库：[song6767/bddl-har-comparison](https://github.com/song6767/bddl-har-comparison)。仓库保存本项目的 PyTorch 实现、运行脚本、实验协议和轻量结果汇总；数据从 UCI 官方来源单独下载，数据集作者信息与许可见下文。
 
-当前阶段的目标是下载数据、建立可复现的人员划分，并跑通三个模型的训练与验证。默认 smoke 实验各训练 5 轮、使用一个随机种子；它验证整个流程能够运行，不能作为正式性能排名或最终测试结果。
+三个模型各在验证集上尝试 3 个学习率，再用选定的学习率分别训练 3 个随机种子。冻结 9 个检查点后，在同一官方测试集上统一评分。[正式对比结果与图表](reports/formal/README.md)
 
-三个模型均已完成 5 轮 smoke 训练，验证记录与图表见 [本次运行结果](reports/smoke/README.md)。官方测试集尚未用于预测或评分。
+各模型训练 5 轮、使用单个种子的流程试跑另有记录。[试跑结果与图表](reports/smoke/README.md)
 
 ## 数据与实验范围
 
@@ -23,7 +23,7 @@
 | 部分 | 受试者数量 | 窗口数量 | 用途 |
 | --- | ---: | ---: | --- |
 | 训练 | 17 | 5,844 | 拟合标准化参数和模型权重 |
-| 验证 | 4 | 1,508 | 选择模型、训练轮数和超参数 |
+| 验证 | 4 | 1,508 | 为每个架构选择学习率与最佳检查点 |
 | 官方测试 | 9 | 2,947 | 配置冻结后的最终评价 |
 
 数据使用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可。下载脚本保留来源和文件校验信息，原始数据、处理后的数组和模型权重不放入 Git 仓库。
@@ -88,7 +88,7 @@ python -m har_compare.train --model cnn --data-dir data/processed --output-dir r
 
 三个模型均使用 0.2 的分类前 dropout 和 6 类线性分类头。参数量处于相近规模，但参数量相近并不意味着表达能力或计算量完全相同，报告中仍需单独比较效率。
 
-训练共用 batch size 64、Adam 优化器、梯度裁剪和验证集 Macro-F1 选优规则。每轮记录训练损失、验证损失、验证准确率和 Macro-F1。提前停止只基于验证表现。不要因为某个模型在 smoke 阶段暂时较低，就只对它增加训练预算而保留其他模型的短训练结果用于比较。
+训练共用 batch size 64、Adam 优化器、梯度裁剪和验证集 Macro-F1 选优规则。每轮记录训练损失、验证损失、验证准确率和 Macro-F1。早停依据验证表现，各模型共用相同的最大轮数和耐心值。
 
 ## 输出文件
 
@@ -101,7 +101,7 @@ python -m har_compare.train --model cnn --data-dir data/processed --output-dir r
 - `learning_curves.png`：训练过程曲线。
 - `confusion_matrix.png`：验证集混淆矩阵。
 
-图表和初步结果应注明“验证集”“smoke”“训练轮数”和“随机种子”。正式报告需要补充多种子结果；不能把重复随机种子的标准差解释为对所有受试者总体的置信区间。
+试跑图表对应单种子的验证集结果。正式报告按模型汇总三个种子的官方测试分数及样本标准差。
 
 完成训练后，可以导出适合提交 GitHub 的轻量结果：
 
@@ -111,13 +111,24 @@ python -m har_compare.summarize --runs-root runs/smoke --output-dir reports/smok
 
 导出内容包括指标汇总、逐轮记录、图表、数据说明和结果 README，不包含数据数组或模型权重。不同实验阶段和配置使用独立的导出目录，避免混合比较。
 
-## 正式实验的运行入口
+## 复现正式实验
+
+在项目根目录准备数据后，依次运行以下命令。已有同名实验目录时，为新实验指定不同的 `--root` 和 `--output`，以便保留原始记录。没有 CUDA 时，可在带 `--device` 的步骤中统一使用 `cpu`。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/run_formal.ps1 -Python python -Device cuda
+python -m har_compare.formal_train tune --root runs/formal_v1 --device cuda
+python -m har_compare.formal_train train --root runs/formal_v1 --device cuda
+python -m har_compare.formal_test freeze --root runs/formal_v1
+python -m har_compare.formal_test evaluate --root runs/formal_v1 --device cuda
+python -m har_compare.formal_report --root runs/formal_v1 --output reports/formal
 ```
 
-默认对三个模型分别使用 `42、43、44` 三个训练种子，最多训练 50 轮，并在验证表现停止改善时提前停止。这一入口仍然只进行训练和验证；运行前应完成等预算的验证集调参。如果不同模型选出了不同学习率，请分别使用训练命令记录各自冻结后的配置，不要直接把统一默认学习率的九次训练当成已经完成公平调参。
+1. **调参**。三个模型分别用相同的种子 `41` 试验 `0.0003`、`0.001`、`0.003`，合计 9 次训练。每次最多 50 轮，验证集 Macro-F1 连续 8 轮未改善则早停。对每个模型比较三个学习率各自的最佳验证集 Macro-F1，使用未四舍五入的分数选最高者，同分取较小的学习率。
+2. **正式训练**。三个模型用各自选定的学习率分别从头训练 `42`、`43`、`44` 三个种子，合计 9 次。按验证集 Macro-F1 保留每次的最佳检查点。
+3. **冻结与测试**。先记录全部配置和检查点的校验值，再验证清单并在同一官方测试集上评分。每个种子均使用相同的 9 位测试受试者。
+4. **汇总**。导出调参记录、逐种子测试指标、对比图表和冻结清单到 `reports/formal/`。数据与权重保存在本地的 `data/` 和 `runs/`。
+
+测试结果中的均值和样本标准差描述三个训练种子的表现与波动。三次评估共用同一组受试者，因此种子波动不能当成跨受试者置信区间。评价范围为 UCI HAR 的官方测试条件。完整设置见 [实验协议](docs/EXPERIMENT_PROTOCOL.md)。
 
 可以单独重载已保存的模型，在验证集复核结果：
 
@@ -125,7 +136,7 @@ powershell -ExecutionPolicy Bypass -File scripts/run_formal.ps1 -Python python -
 python -m har_compare.evaluate --checkpoint runs/smoke/cnn/best.pt --data-dir data/processed --split val --device cuda --output runs/smoke/cnn/recheck_val.json
 ```
 
-评估检查点默认使用验证集，官方测试评估须显式指定 `--split test --allow-test`。只有在结构、超参数和评价方案确定后，才进行官方测试评估。完整约定见 [实验协议](docs/EXPERIMENT_PROTOCOL.md)。
+单检查点复核默认使用验证集。复现正式测试时，使用上面的冻结和批量评估入口。
 
 ## 检查项目
 
