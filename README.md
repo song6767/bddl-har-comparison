@@ -1,6 +1,6 @@
 # CNN、RNN 与 LSTM 的人体活动识别比较
 
-基于 PyTorch 的时序分类项目，使用 UCI HAR 智能手机传感器数据，比较一维 CNN、普通 RNN 和 LSTM 的识别准确率、训练效率及噪声鲁棒性。项目包含数据下载、按受试者划分、验证集调参、多个随机种子训练，以及冻结模型后的统一测试流程。
+基于 PyTorch 的时序分类项目，使用 UCI HAR 智能手机传感器数据，比较一维 CNN、普通 RNN 和 LSTM 的识别准确率、训练效率及噪声鲁棒性。项目包含数据下载、按受试者划分、验证集调参、多个随机种子训练，以及冻结模型后的统一测试与逐受试者分析。
 
 完整的方法、结果与讨论见项目报告：[在线阅读](reports/project_report.md) · [Word 文档](reports/project_report.docx)。实验设置见[实验协议](docs/EXPERIMENT_PROTOCOL.md)。
 
@@ -15,6 +15,8 @@
 | LSTM | 29,606 | 89.49 ± 0.76 | 89.61 ± 0.71 |
 
 数值为三个训练种子的均值 ± 样本标准差。CNN 的平均测试分数最高，RNN 的种子间波动较小；三者最常见的错误均发生在坐姿与站姿之间。
+
+进一步按受试者统计，CNN 在 9 人中的 6 人上平均 Macro-F1 领先，RNN 在其余 3 人上领先。9 号与 10 号受试者仅占 19.75% 的测试窗口，却贡献三种模型各自约 56%–61% 的错误，说明总体分数掩盖了明显的个体差异。详见[逐受试者分数](reports/formal/subject_scores.csv)和[错误分布图](reports/formal/subject_errors.png)。
 
 ![三个模型的官方测试集结果](reports/formal/test_scores.png)
 
@@ -49,6 +51,14 @@ python -m har_compare.summarize --runs-root runs/smoke --output-dir reports/repr
 
 ## 复现完整实验
 
+Windows 下可用统一脚本依次完成数据准备、调参、正式训练、冻结测试、逐受试者分析和噪声实验：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_formal.ps1 -Python python -Device cuda -IncludeNoise
+```
+
+脚本调用下方的同一套实验流程，学习率由验证集选择。默认实验目录为 `runs/formal_v1`；已有该目录时，为新一次复现使用 `-RunRoot` 指定新的目录，并用 `-ReportOutput`、`-NoiseReportOutput` 指定对应结果目录。省略 `-IncludeNoise` 时运行至逐受试者分析。
+
 ### 调参与正式测试
 
 每个模型在验证集上尝试学习率 `0.0003`、`0.001`、`0.003`，共用调参种子 41、最多 50 轮和 8 轮早停耐心值。随后用选定配置训练三个种子，冻结全部检查点，再统一评价官方测试集。
@@ -61,6 +71,16 @@ python -m har_compare.formal_test freeze --root runs/formal_v1
 python -m har_compare.formal_test evaluate --root runs/formal_v1 --device cuda
 python -m har_compare.formal_report --root runs/formal_v1 --output reports/reproduced_formal
 ```
+
+### 逐受试者分析
+
+用同一组冻结模型分别评估 9 名测试受试者，并核对分组预测合并后与原测试结果一致：
+
+```powershell
+python -m har_compare.subject_eval --root runs/formal_v1 --device cuda --output reports/reproduced_formal
+```
+
+这一分析是在已有测试结果基础上开展的描述性分析，用于观察不同受试者的性能与错误分布。每人的结果按三个训练种子汇总；它不会增加独立测试受试者的数量，也不用于重新调参。
 
 ### 噪声鲁棒性
 
@@ -80,7 +100,7 @@ python -m har_compare.noise_report --input runs/formal_v1/noise_v1/results.json 
 python -m unittest discover -s tests -v
 ```
 
-检查覆盖分类指标、模型前向与反向传播、数据指纹，以及数据准备后的受试者隔离与标准化。
+检查覆盖分类指标、模型前向与反向传播、数据指纹、逐受试者统计，以及数据准备后的受试者隔离与标准化。
 
 ## 数据与目录
 
@@ -99,6 +119,16 @@ runs/           本地训练记录与模型权重
 ```
 
 仓库保存代码、报告和轻量实验结果。数据与模型权重由上述命令在本地生成。
+
+## 生成提交包
+
+在完整仓库中运行：
+
+```powershell
+python scripts/package_submission.py
+```
+
+压缩包输出到 `submission/BDDL_HAR_Project_2026.zip`，包含报告、代码、README、图表和关键结果。包内图表集中在 `reports/figures/`，统计结果集中在 `reports/results/`，不附带试跑记录或逐次训练日志。完整实验记录保留在本地仓库和 [GitHub](https://github.com/song6767/bddl-har-comparison)。
 
 ## 数据来源
 
